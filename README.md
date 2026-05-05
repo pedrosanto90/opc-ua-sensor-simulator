@@ -6,7 +6,7 @@ This is an OPC UA simulation server written in Python, which sends out 3 values 
 
 1. Download or clone all files
 
-`git clone https://github.com/flopach/opc-ua-sensor-simulator`
+`git clone git@github.com:pedrosanto90/opc-ua-sensor-simulator.git`
 
 2. Install required Python packages (Python 3 is required)
 
@@ -17,6 +17,14 @@ This is an OPC UA simulation server written in Python, which sends out 3 values 
 4. Run the script (Port **4840** needs to be open!):
 
 `python opc-ua-server.py`
+
+## Docker
+
+You can also run the server using Docker:
+
+`docker compose up --build`
+
+The server will be available at `opc.tcp://localhost:4840/opcua/`.
 
 ## Sensor Data
 

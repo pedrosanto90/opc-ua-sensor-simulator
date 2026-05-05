@@ -1,0 +1,26 @@
+services:
+  opc-ua-sensor-simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: opc-ua-sensor-simulator
+    environment:
+      OPCUA_HOST: 0.0.0.0
+      OPCUA_PORT: 4840
+      OPCUA_PATH: /opcua/
+      SENSOR_CSV: /app/sensor.csv
+    ports:
+      - "4840:4840"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import socket; socket.create_connection(('127.0.0.1', 4840), 5).close()",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped

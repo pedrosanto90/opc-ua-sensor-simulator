@@ -5,6 +5,7 @@
 #LGPL-3.0 License
 
 import logging
+import os
 import asyncio
 import pandas as pd
 
@@ -18,11 +19,21 @@ _logger = logging.getLogger('asyncua')
 def func(parent, value):
     return value * 2
 
+def get_endpoint():
+    host = os.environ.get('OPCUA_HOST', '127.0.0.1')
+    port = os.environ.get('OPCUA_PORT', '4840')
+    path = os.environ.get('OPCUA_PATH', '/opcua/')
+    if not path.startswith('/'):
+        path = '/' + path
+    if not path.endswith('/'):
+        path = path + '/'
+    return f'opc.tcp://{host}:{port}{path}'
+
 async def main():
     # setup our server
     server = Server()
     await server.init()
-    server.set_endpoint('opc.tcp://127.0.0.1:4840/opcua/')
+    server.set_endpoint(get_endpoint())
     server.set_server_name("DevNet OPC-UA Test Server")
 
     # setup our own namespace, not really necessary but should as spec
@@ -37,17 +48,18 @@ async def main():
     var_pumpsetting = await obj_vplc.add_variable(idx, 'pumpsetting', 0)
 
     # Read Sensor Data from Kaggle
-    df = pd.read_csv("sensor.csv")
+    df = pd.read_csv(os.environ.get('SENSOR_CSV', 'sensor.csv'))
     # Only use sensor data from 03 and 01 (preference)
     sensor_data = pd.concat([df["sensor_03"], df["sensor_01"]], axis=1)
+    sensor_03_mean = df["sensor_03"].mean()
 
-    _logger.info('Starting server!')
+    _logger.info('Starting server on %s', get_endpoint())
     async with server:
         # run forever and iterate over the dataframe
         while True:
             for row in sensor_data.itertuples():
                 # if below the mean use different setting - just for testing
-                if row[1] < df["sensor_03"].mean():
+                if row[1] < sensor_03_mean:
                     setting = "standard"
                 else:
                     setting = "speed"
