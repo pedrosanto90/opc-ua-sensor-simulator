@@ -22,7 +22,7 @@ This is an OPC UA simulation server written in Python, which sends out 3 values 
 
 You can also run the server using Docker:
 
-`docker compose up --build`
+`docker compose up --build -d`
 
 The server will be available at `opc.tcp://localhost:4840/opcua/`.
 
